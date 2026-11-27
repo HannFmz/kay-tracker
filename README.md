@@ -16,6 +16,14 @@ Fan-made. Not affiliated with GRYPHLINE or Hypergryph.
 
 Charts use [d3 v7.9.0](https://d3js.org) from jsDelivr. There is no build step and nothing to install.
 
+## Browser Access
+
+You can access the dashboard via this link:
+
+```Link
+https://hannfmz.github.io/kay-tracker/
+```
+
 ## Run it on your computer
 
 Any static file server works. With Python, from inside the `kay-tracker` folder:
