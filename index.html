@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kay Pull Tracker</title>
+<meta name="description" content="Track your pulls toward Kay's 120-pull guarantee in Arknights: Endfield.">
+<meta name="theme-color" content="#0d0e0c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="kt">
+  <header class="kt-head" id="summary">
+    <h1>Kay pull tracker</h1>
+    <p>Anvil, Backpack, Plus A Pot o'Honey · Asia server · banner ends 23 Dec 2026, 11:59 server time</p>
+  </header>
+
+  <div class="kt-grid" id="kpis">
+    <div class="kt-card kt-kpi" id="kpi-done">
+      <span class="kt-label">Pulls done on Kay's banner</span>
+      <div class="kt-numrow">
+        <span class="kt-big"><span data-draw="pulls_done" data-source="status" data-field="pulls_done" data-row="0">—</span><span class="kt-unit">of <span data-draw="target" data-source="status" data-field="target" data-row="0">—</span></span></span>
+      </div>
+      <span class="kt-pill kt-good" data-variant="delta-yes" hidden><span data-draw="pulls_change" data-source="status" data-field="pulls_change" data-row="0">—</span> <small>since <span data-draw="prev_date" data-source="status" data-field="prev_date" data-row="0">—</span></small></span>
+      <p class="kt-sub" data-variant="delta-no">Log a second day to see the change.</p>
+    </div>
+    <div class="kt-card kt-kpi" id="kpi-earn">
+      <span class="kt-label">Oroberyl still to earn</span>
+      <div class="kt-numrow"><span class="kt-big" data-draw="need_oro" data-source="status" data-field="need_oro" data-row="0">—</span></div>
+      <span class="kt-pill kt-good" id="need-pill" data-variant="delta-yes" hidden><span data-draw="need_change" data-source="status" data-field="need_change" data-row="0">—</span> <small>since <span data-draw="prev_date" data-source="status" data-field="prev_date" data-row="0">—</span></small></span>
+      <p class="kt-sub" data-variant="delta-no">About <b data-draw="earn_pulls" data-source="status" data-field="earn_pulls" data-row="0">—</b> pulls' worth.</p>
+    </div>
+    <div class="kt-card kt-kpi" id="kpi-perday">
+      <span class="kt-label">Needed per day, free</span>
+      <div class="kt-numrow"><span class="kt-big" data-draw="per_day_free" data-source="status" data-field="per_day_free" data-row="0">—</span><span class="kt-unit">Oroberyl</span></div>
+      <p class="kt-sub"><b data-draw="per_day_pass" data-source="status" data-field="per_day_pass" data-row="0">—</b> a day with the Monthly Pass</p>
+    </div>
+    <div class="kt-card kt-kpi" id="kpi-time">
+      <span class="kt-label">Time left</span>
+      <div class="kt-numrow"><span class="kt-big" data-draw="days_left" data-source="status" data-field="days_left" data-row="0">—</span><span class="kt-unit">days</span></div>
+      <p class="kt-sub">Until 23 Dec, 11:59 server time</p>
+    </div>
+
+    <section class="kt-card kt-ledgercard" id="balance">
+      <h2 class="kt-h">Your balance</h2>
+      <p class="kt-sub">As logged on <b data-draw="as_of" data-source="status" data-field="as_of" data-row="0">—</b></p>
+      <ul class="kt-ledger">
+        <li><span>Oroberyl</span><b data-draw="oroberyl" data-source="status" data-field="oroberyl" data-row="0">—</b></li>
+        <li><span>HH permits</span><b data-draw="permits" data-source="status" data-field="permits" data-row="0">—</b></li>
+        <li><span>Origeometry</span><b data-draw="origeometry" data-source="status" data-field="origeometry" data-row="0">—</b></li>
+        <li><span>Worth in Oroberyl</span><b data-draw="eff_oro" data-source="status" data-field="eff_oro" data-row="0">—</b></li>
+        <li><span>Pulls it buys now</span><b data-draw="pulls_now" data-source="status" data-field="pulls_now" data-row="0">—</b></li>
+      </ul>
+    </section>
+
+    <section class="kt-card kt-chartcard" id="history">
+      <div class="kt-numrow">
+        <div class="kt-numrow">
+          <span class="kt-big"><span data-draw="secured" data-source="status" data-field="secured" data-row="0">—</span><span class="kt-unit">pulls secured</span></span>
+          <span class="kt-pill kt-good" data-variant="delta-yes" hidden><span data-draw="secured_change" data-source="status" data-field="secured_change" data-row="0">—</span></span>
+        </div>
+        <div class="kt-legend">
+          <span><i class="kt-sw" data-swatch="now"></i>Latest</span>
+          <span><i class="kt-sw" data-swatch="logged"></i>Logged</span>
+          <span><i class="kt-sw" data-swatch="path"></i>Path to 120</span>
+          <span data-variant="pace-yes" hidden><i class="kt-sw kt-sw-line"></i>Your free pace</span>
+        </div>
+      </div>
+      <h2 class="kt-h">Pulls secured each day vs the path to 120</h2>
+      <p class="kt-sub">Secured = pulls done + pulls your balance can buy.</p>
+      <div class="kt-chart" data-draw="days" data-source="history status facts"></div>
+      <p class="kt-sub" data-variant="pace-no">Save entries on two different days and your real free pace shows here.</p>
+      <p class="kt-sub" data-variant="pace-yes" hidden>Your free pace so far is <b data-draw="pace" data-source="status" data-field="pace" data-row="0">—</b> Oroberyl a day: <b data-draw="proj_free" data-source="status" data-field="proj_free" data-row="0">—</b> pulls by 23 Dec, or <b data-draw="proj_pass" data-source="status" data-field="proj_pass" data-row="0">—</b> with the pass.</p>
+    </section>
+
+    <section class="kt-card kt-donutcard" id="where-pulls-come-from">
+      <h2 class="kt-h">Where your 120 pulls come from</h2>
+      <div class="kt-donutwrap">
+        <div class="kt-donut" data-draw="donut" data-source="breakdown"></div>
+        <ul class="kt-dlegend" data-draw="donut_legend" data-source="breakdown"></ul>
+      </div>
+      <div class="kt-inset">
+        <p class="kt-sub" data-variant="pass-off">Bought today, the Monthly Pass adds <b data-draw="pass_income" data-source="status" data-field="pass_income" data-row="0">—</b> Oroberyl: <b data-draw="claims_left" data-source="status" data-field="claims_left" data-row="0">—</b> logins × 200, plus 12 Origeometry. Each HH permit counts as one pull.</p>
+        <p class="kt-sub" data-variant="pass-on" hidden>Your active pass still adds <b data-draw="pass_income" data-source="status" data-field="pass_income" data-row="0">—</b> Oroberyl from <b data-draw="claims_left" data-source="status" data-field="claims_left" data-row="0">—</b> logins. Each HH permit counts as one pull.</p>
+      </div>
+    </section>
+
+    <section class="kt-card kt-insight" id="takeaway">
+      <span class="kt-label">To lock in Kay by 23 Dec</span>
+      <p data-variant="say-empty" hidden>Save your first entry to start tracking.</p>
+      <p data-variant="say-done" hidden>You've made <span class="kt-hl" data-draw="pulls_done" data-source="status" data-field="pulls_done" data-row="0">—</span> pulls. Kay's 120-pull guarantee is reached.</p>
+      <p data-variant="say-funded" hidden>Your Oroberyl and permits already cover the rest of the way to 120. Spend them to lock in Kay.</p>
+      <div data-variant="say-short">
+        <p>Earn about <span class="kt-hl" data-draw="per_day_free" data-source="status" data-field="per_day_free" data-row="0">—</span> free Oroberyl a day to reach the 120-pull guarantee.</p>
+        <p class="kt-small" style="margin-top:8px">Or <b data-draw="per_day_pass" data-source="status" data-field="per_day_pass" data-row="0">—</b> a day with the Monthly Pass.</p>
+      </div>
+      <div>
+        <div class="kt-segs" data-draw="segs" data-source="status" role="img"></div>
+        <p class="kt-small" style="margin-top:8px"><b data-draw="pulls_done" data-source="status" data-field="pulls_done" data-row="0">—</b> of 120 pulls done, each block is 10</p>
+      </div>
+    </section>
+
+    <section class="kt-card kt-calcard" id="calendar">
+      <h2 class="kt-h">Banner calendar: days logged and pulls made</h2>
+      <div class="kt-legend">
+        <span><i class="kt-sw" data-swatch="l1"></i>Logged, no pulls</span>
+        <span><i class="kt-sw" data-swatch="l2"></i>1–9 pulls</span>
+        <span><i class="kt-sw" data-swatch="l3"></i>10+ pulls</span>
+      </div>
+      <div class="kt-cal" data-draw="cal" data-source="history facts"></div>
+      <div class="kt-stats">
+        <div><span>Entries</span><b data-draw="entries" data-source="status" data-field="entries" data-row="0">—</b></div>
+        <div><span>Days left</span><b data-draw="days_left" data-source="status" data-field="days_left" data-row="0">—</b></div>
+        <div><span>Ends</span><b>23 Dec</b></div>
+      </div>
+    </section>
+
+    <section class="kt-card kt-logcard" id="log">
+      <h2 class="kt-h">Log today's numbers</h2>
+      <p class="kt-sub">Saving the same date again replaces that day. "Pulls done" is the banner's own counter toward 120.</p>
+      <form id="log-form" class="kt-form">
+        <label class="kt-field">Date<input type="date" name="entry_date" min="2026-11-24" max="2026-12-31" required></label>
+        <label class="kt-field">Pulls done<input type="number" name="pulls_done" min="0" max="200" step="1" inputmode="numeric" required></label>
+        <label class="kt-field">Oroberyl<input type="number" name="oroberyl" min="0" step="1" inputmode="numeric" required></label>
+        <label class="kt-field">HH permits<input type="number" name="permits" min="0" step="1" inputmode="numeric" value="0"></label>
+        <label class="kt-field">Origeometry<input type="number" name="origeometry" min="0" step="1" inputmode="numeric" value="0"></label>
+        <label class="kt-field kt-check"><input type="checkbox" name="pass">Monthly Pass active</label>
+        <button type="submit" class="kt-btn">Save entry</button>
+      </form>
+      <p class="kt-msg kt-ok" id="saved-msg" hidden>Saved.</p>
+      <p class="kt-msg kt-err" id="unsaved" hidden>That wasn't saved.</p>
+      <p class="kt-msg kt-err" id="invalid" hidden>Fill in a date and whole numbers of 0 or more.</p>
+      <div class="kt-backup">
+        <button type="button" class="kt-btn-small" id="export-btn">Export backup</button>
+        <label class="kt-btn-small kt-file">Import backup<input type="file" id="import-file" accept="application/json,.json"></label>
+        <button type="button" class="kt-btn-small kt-install" id="install-btn" hidden>Install app</button>
+      </div>
+      <p class="kt-msg" id="backup-msg" hidden></p>
+      <p class="kt-sub">Entries are saved in this browser only. Export a backup before clearing browser data or moving to another device.</p>
+    </section>
+
+    <section class="kt-card" id="entries">
+      <h2 class="kt-h">Your entries</h2>
+      <div class="kt-tablewrap">
+        <table class="kt-table" data-source="history" data-row-key="date">
+          <thead><tr><th data-field="date">Date</th><th data-field="oroberyl">Oroberyl</th><th data-field="origeometry">Origeometry</th><th data-field="permits">Permits</th><th data-field="pulls_done">Pulls done</th><th data-field="pass">Pass</th><th data-field="eff_oro">Worth (Oroberyl)</th><th data-field="secured">Secured</th><th></th></tr></thead>
+          <tbody data-draw="rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <details class="kt-details" id="more">
+    <summary>Where the rest could come from</summary>
+    <p>Oroberyl: daily activity, the weekly routine, version 1.7 events, redeem and livestream codes, Talos-II chests (15–60 each), Etchspace Salvage (1,800 in total) and SKPORT's web sign-in.</p>
+    <p>Permits: Bond Quota buys up to 5 current-banner tickets at 15 each, or Chartered permits at 25 each. Duplicates give 50 Bond Quota per 6★ and 10 per 5★. The AIC Quota exchange and version sign-ins add a few more. Not for Kay: the 60-pull Headhunting Dossier becomes a 10-pull for the next banner.</p>
+  </details>
+
+  <details class="kt-details" id="method">
+    <summary>How the numbers are worked out</summary>
+    <p>Progress counts only pulls done, the banner's own counter. Each HH permit is a 500-Oroberyl discount on a pull, so your balance is worth Oroberyl + permits × 500 + Origeometry × 75. Oroberyl still to earn = (120 − pulls done) × 500 − that value.</p>
+    <p>Per-day figures divide what's still needed by the time left. The Monthly Pass figure assumes you buy it today, so you get today's login plus each 4:00 reset before the banner ends (30 at most), and the 12 Origeometry.</p>
+    <p>Free pace is your average daily gain between entries, with Monthly Pass income removed on days it was active. Pulls you make don't change it, because spent Oroberyl moves into "pulls done". The path to 120 is a straight line from your latest entry to 120 on 23 Dec.</p>
+    <p>Changes compare your latest entry with the one before it. Separately, your 6★ pity (80 pulls, 50% chance of Kay) carries over to later banners, but the 120-pull guarantee only applies to this banner.</p>
+  </details>
+  <p class="kt-foot">Fan-made tracker, not affiliated with GRYPHLINE or Hypergryph. Banner facts gathered from game guides on 26 Nov 2026.</p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
