@@ -1,3 +1,5 @@
 # personal log backups stay on this computer
 my-log.json
 kay-tracker-backup-*.json
+# learning notes stay on this computer
+.vibe-wise/
