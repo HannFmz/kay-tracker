@@ -18,11 +18,8 @@ Charts use [d3 v7.9.0](https://d3js.org) from jsDelivr. There is no build step a
 
 ## Browser Access
 
-You can access the dashboard via this link:
+You can access the dashboard via this link: https://hannfmz.github.io/kay-tracker/
 
-```Link
-https://hannfmz.github.io/kay-tracker/
-```
 
 ## Run it on your computer
 
@@ -32,7 +29,7 @@ Any static file server works. With Python, from inside the `kay-tracker` folder:
 python -m http.server 8766
 ```
 
-From anywhere else, give the full path instead, for example `python -m http.server 8766 -d D:\Myth\kay-tracker`. A 404 on every page means the server is pointed at the wrong folder.
+From anywhere else, give the full path instead, for example `python -m http.server 8766 -d D:\Something\kay-tracker`. A 404 on every page means the server is pointed at the wrong folder.
 
 Then open http://localhost:8766. Opening `index.html` by double-clicking also works, but the app can't be installed or used offline that way.
 
