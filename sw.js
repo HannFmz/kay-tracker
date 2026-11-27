@@ -1,6 +1,6 @@
 // Keeps the app working offline.
-const CACHE = 'kay-tracker-v2';
-const ASSETS = ['./', './index.html', './styles.css', './app.js', './manifest.webmanifest',
+const CACHE = 'kay-tracker-v3';
+const ASSETS = ['./', './index.html', './styles.css', './pass.js', './app.js', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png', 'https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js'];
 
 self.addEventListener('install', (e) => {

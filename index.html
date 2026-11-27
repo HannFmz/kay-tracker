@@ -15,7 +15,7 @@
 <div class="kt">
   <header class="kt-head" id="summary">
     <h1>Kay pull tracker</h1>
-    <p>Anvil, Backpack, Plus A Pot o'Honey · Asia server · banner ends 23 Dec 2026, 11:59 server time</p>
+    <p>Anvil, Backpack, Plus A Pot o'Honey · Asia server · banner ends 23 Dec 2026, 11:59 PM server time</p>
   </header>
 
   <div class="kt-grid" id="kpis">
@@ -41,7 +41,7 @@
     <div class="kt-card kt-kpi" id="kpi-time">
       <span class="kt-label">Time left</span>
       <div class="kt-numrow"><span class="kt-big" data-draw="days_left" data-source="status" data-field="days_left" data-row="0">—</span><span class="kt-unit">days</span></div>
-      <p class="kt-sub">Until 23 Dec, 11:59 server time</p>
+      <p class="kt-sub">Until 23 Dec, 11:59 PM server time</p>
     </div>
 
     <section class="kt-card kt-ledgercard" id="balance">
@@ -127,12 +127,25 @@
         <label class="kt-field">Oroberyl<input type="number" name="oroberyl" min="0" step="1" inputmode="numeric" required></label>
         <label class="kt-field">HH permits<input type="number" name="permits" min="0" step="1" inputmode="numeric" value="0"></label>
         <label class="kt-field">Origeometry<input type="number" name="origeometry" min="0" step="1" inputmode="numeric" value="0"></label>
-        <label class="kt-field kt-check"><input type="checkbox" name="pass">Monthly Pass active</label>
+        <label class="kt-field kt-check"><input type="checkbox" name="pass">Bought the Monthly Pass on this day</label>
+        <details class="kt-pass-more" id="pass-more">
+          <summary>Add specific date of monthly pass purchase</summary>
+          <div class="kt-pass-row">
+            <label class="kt-field">Purchase date<input type="date" name="purchase_date"></label>
+            <button type="button" class="kt-btn-small" id="purchase-btn">Save date</button>
+          </div>
+          <div class="kt-pass-row">
+            <label class="kt-field">Renewal date<input type="date" name="renewal_date"></label>
+            <button type="button" class="kt-btn-small" id="renewal-btn">Renewal Pass</button>
+          </div>
+          <p class="kt-msg" id="pass-msg" hidden></p>
+        </details>
         <button type="submit" class="kt-btn">Save entry</button>
       </form>
       <p class="kt-msg kt-ok" id="saved-msg" hidden>Saved.</p>
       <p class="kt-msg kt-err" id="unsaved" hidden>That wasn't saved.</p>
       <p class="kt-msg kt-err" id="invalid" hidden>Fill in a date and whole numbers of 0 or more.</p>
+      <p class="kt-msg kt-err" id="banner-passed" hidden>The Banner has passed.</p>
       <div class="kt-backup">
         <button type="button" class="kt-btn-small" id="export-btn">Export backup</button>
         <label class="kt-btn-small kt-file">Import backup<input type="file" id="import-file" accept="application/json,.json"></label>
@@ -169,6 +182,7 @@
   <p class="kt-foot">Fan-made tracker, not affiliated with GRYPHLINE or Hypergryph. Banner facts gathered from game guides on 26 Nov 2026.</p>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="pass.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

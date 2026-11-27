@@ -54,8 +54,10 @@ Then open http://localhost:8766. Opening `index.html` by double-clicking also wo
 
 Entries are saved in the browser you use, on that device only. They are not sent anywhere and aren't in the repository.
 
-- **Export backup** downloads a `.json` file of every entry.
-- **Import backup** loads one. Entries with the same date are replaced, others are kept.
+- **Monthly Pass:** tick "Bought the Monthly Pass on this day" on the entry for the day you bought it. If you bought it before you started logging, open "Add specific date of monthly pass purchase" and enter the date there. Only one purchase date is kept, and the latest one you save wins. **Renewal Pass** adds a second pass after the first; **Undo** removes it. These dates are stored apart from the daily entries.
+- **Export backup** downloads a `.json` file of every entry and your pass dates.
+- **Import backup** loads one. Entries with the same date are replaced, others are kept. Pass dates in the file replace the current ones; older backups without them leave the current dates alone.
+- After the banner ends (23 Dec 2026, 11:59 PM server time), saving entries and changing pass dates is blocked. Export and import still work.
 - `my-log.json` in this folder holds your entries from the Claude dashboard (26 and 27 Nov). Import it once to carry them over. It's listed in `.gitignore`, so it won't be pushed to GitHub.
 
 The installed app and the browser tab share the same saved entries. A different browser or device starts empty, so use a backup to move them.

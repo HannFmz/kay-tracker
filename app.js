@@ -2,12 +2,13 @@
 // Your log lives in this browser's localStorage; banner facts are fixed below.
 (function () {
   const KEY = 'kay-tracker.log.v1';
+  const PASS_KEY = 'kay-tracker.pass.v1';
 
   // Gathered from game guides on 26 Nov 2026 (Prydwen, GameWith, Game8, PlayStation Store).
   const FACTS = [
     { key: 'pull_cost', value: 500, label: 'Oroberyl per Chartered Headhunting pull' },
     { key: 'spark', value: 120, label: 'Pulls for the guaranteed featured operator (once per banner)' },
-    { key: 'banner_end', value: '2026-12-23T11:59:00+08:00', label: 'Kay banner end, Asia server time (UTC+8)' },
+    { key: 'banner_end', value: '2026-12-23T23:59:00+08:00', label: 'Kay banner end, 11:59 PM Asia server time (UTC+8)' },
     { key: 'pass_daily', value: 200, label: 'Monthly Pass Oroberyl per daily login' },
     { key: 'pass_days', value: 30, label: 'Monthly Pass length in days' },
     { key: 'pass_origeo', value: 12, label: 'Origeometry given on Monthly Pass purchase' },
@@ -40,7 +41,21 @@
     schedule();
   }
 
+  // One purchase date and an optional renewal after it, kept apart from the daily entries.
+  const isDay = (s) => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
+  function cleanPass(p) {
+    p = p && typeof p === 'object' ? p : {};
+    const purchase = isDay(p.purchase) ? p.purchase : null;
+    const renewal = purchase && isDay(p.renewal) && p.renewal > purchase ? p.renewal : null;
+    return { purchase, renewal };
+  }
+  function readPass() {
+    try { return cleanPass(JSON.parse(localStorage.getItem(PASS_KEY) || '{}')); } catch (e) { return cleanPass(null); }
+  }
+
   window.kayStore = {
+    pass: readPass,
+    setPass(p) { localStorage.setItem(PASS_KEY, JSON.stringify(cleanPass(p))); schedule(); },
     all: readLog,
     put(row) {
       const r = cleanRow(row);
@@ -69,6 +84,7 @@
     let v;
     if (id === 'facts') v = FACTS;
     else if (id === 'log') v = readLog();
+    else if (id === 'pass') v = readPass();
     else if (calcs[id]) v = calcs[id].fn(...calcs[id].inputs.map(rows));
     else throw new Error('Unknown source: ' + id);
     cache[id] = v;
@@ -105,18 +121,19 @@
     const w = document.documentElement.clientWidth;
     if (w !== lastW) { lastW = w; schedule(); }
   }).observe(document.documentElement);
-  window.addEventListener('storage', (e) => { if (e.key === KEY) schedule(); });
+  window.addEventListener('storage', (e) => { if (e.key === KEY || e.key === PASS_KEY) schedule(); });
   document.addEventListener('visibilitychange', () => { if (!document.hidden) schedule(); }); // refresh "days left"
   window.addEventListener('DOMContentLoaded', schedule);
 })();
 
 dash.calc('history', {
-  inputs: ['log', 'facts'],
+  inputs: ['log', 'facts', 'pass'],
   title: 'Pulls secured by entry',
   description: 'Each saved entry with its Oroberyl value (Oroberyl + permits × 500 + Origeometry × 75) and pulls done + pulls that value can buy.',
-  fn: (log, facts) => {
+  fn: (log, facts, pass) => {
     const f = Object.fromEntries(facts.map((r) => [r.key, r.value]));
     return log.map((r) => {
+      const at = resetOf(String(r.date));
       const oroberyl = Number(r.oroberyl) || 0;
       const origeometry = Number(r.origeometry) || 0;
       const permits = Number(r.permits) || 0;
@@ -126,7 +143,7 @@ dash.calc('history', {
         date: String(r.date || r.id),
         oroberyl, origeometry, permits, pulls_done,
         eff_oro: oroberyl + permits * f.pull_cost + origeometry * f.origeo_rate,
-        pass: r.pass === true || r.pass === 'true' ? 'Yes' : 'No',
+        pass: passClaims(at - 1, at, pass) > 0 ? 'Yes' : 'No', // active that server day
         secured: Math.floor(exact),
         secured_exact: Math.round(exact * 100) / 100
       };
@@ -135,10 +152,10 @@ dash.calc('history', {
 });
 
 dash.calc('status', {
-  inputs: ['history', 'facts'],
+  inputs: ['history', 'facts', 'pass'],
   title: 'Where you stand now',
   description: 'From your latest entry: balance, pulls done, Oroberyl still to earn, time left, Monthly Pass income still to come, your free pace, and changes since the entry before.',
-  fn: (history, facts) => {
+  fn: (history, facts, pass) => {
     if (!history || !history.length) return [];
     const f = Object.fromEntries(facts.map((r) => [r.key, r.value]));
     const day = 86400000, hour = 3600000;
@@ -152,8 +169,9 @@ dash.calc('status', {
     if (next <= now) next += day;
     let resets = 0;
     for (let t = next; t <= end; t += day) resets++;
-    const active = last.pass === 'Yes';
-    const claims = Math.min(f.pass_days, active ? resets : resets + 1);
+    const owned = passClaims(now, end, pass); // claims still to come from passes already bought
+    const active = owned > 0;
+    const claims = active ? owned : Math.min(f.pass_days, resets + 1); // otherwise: if bought now
     const passIncome = claims * f.pass_daily + (active ? 0 : f.pass_origeo * f.origeo_rate);
     const fixedPulls = last.pulls_done;
     const oroValue = last.eff_oro;
@@ -168,7 +186,9 @@ dash.calc('status', {
         const a = history[i - 1], b = history[i];
         const d = (Date.parse(b.date) - Date.parse(a.date)) / day;
         let g = (b.secured_exact - a.secured_exact) * f.pull_cost;
-        if (b.pass === 'Yes') g -= d * f.pass_daily + (a.pass === 'Yes' ? 0 : f.pass_origeo * f.origeo_rate);
+        // take out pass income: claims between the two entries, plus the Origeometry from any purchase
+        const bought = [pass.purchase, pass.renewal].filter((p) => p && p > a.date && p <= b.date).length;
+        g -= passClaims(resetOf(a.date), resetOf(b.date), pass) * f.pass_daily + bought * f.pass_origeo * f.origeo_rate;
         gain += g; days += d;
       }
       if (days > 0) pace = Math.round(gain / days);
@@ -260,9 +280,18 @@ dash.calc('breakdown', {
 
   let dirty = false;
   const form = document.getElementById('log-form');
-  if (form) form.addEventListener('input', () => { dirty = true; });
+  const passPanel = document.getElementById('pass-more');
+  if (form) form.addEventListener('input', (e) => { if (!passPanel.contains(e.target)) dirty = true; });
+  // the checkbox shows whether the saved purchase date is the entry's date
+  if (form) form.elements.entry_date.addEventListener('change', () => {
+    form.elements.pass.checked = kayStore.pass().purchase === form.elements.entry_date.value;
+  });
 
   function todayLocal() { return new Date().toLocaleDateString('en-CA'); }
+  function bannerOver() {
+    const end = dash.data('facts').data.find((r) => r.key === 'banner_end');
+    return !!end && Date.now() > Date.parse(end.value);
+  }
 
   dash.onData(() => {
     const s = dash.data('status');
@@ -291,13 +320,22 @@ dash.calc('breakdown', {
         form.elements.origeometry.value = last.origeometry;
         form.elements.permits.value = last.permits;
         form.elements.pulls_done.value = last.pulls_done;
-        form.elements.pass.checked = last.pass === 'Yes';
       }
+      form.elements.pass.checked = kayStore.pass().purchase === form.elements.entry_date.value;
     }
+
+    if (form && !passPanel.contains(document.activeElement)) {
+      const p = kayStore.pass();
+      // only one place shows the purchase: the checkbox when it is the entry's date, otherwise this field
+      form.elements.purchase_date.value = p.purchase && p.purchase !== form.elements.entry_date.value ? p.purchase : '';
+      form.elements.renewal_date.value = p.renewal || '';
+    }
+    // outside the focus check: the clicked button itself has focus
+    if (form) document.getElementById('renewal-btn').textContent = kayStore.pass().renewal ? 'Undo' : 'Renewal Pass';
   });
 
   function showMsg(which) {
-    ['saved-msg', 'unsaved', 'invalid'].forEach((id) => {
+    ['saved-msg', 'unsaved', 'invalid', 'banner-passed'].forEach((id) => {
       document.querySelectorAll('#' + id).forEach((p) => { p.hidden = id !== which; });
     });
   }
@@ -308,6 +346,7 @@ dash.calc('breakdown', {
 
   if (form) form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (bannerOver()) { showMsg('banner-passed'); return; }
     const el = form.elements;
     const date = el.entry_date.value;
     const nums = ['oroberyl', 'origeometry', 'permits', 'pulls_done'].map((k) => Number(el[k].value === '' ? 0 : el[k].value));
@@ -316,9 +355,35 @@ dash.calc('breakdown', {
     const row = { date: date, oroberyl: nums[0], origeometry: nums[1], permits: nums[2], pulls_done: nums[3], pass: el.pass.checked };
     try {
       kayStore.put(row);
+      // ticked = bought on this day (replaces any other purchase date); unticked clears it if it was this day
+      const p = kayStore.pass();
+      if (el.pass.checked) kayStore.setPass({ purchase: date, renewal: p.renewal });
+      else if (p.purchase === date) kayStore.setPass({ purchase: null, renewal: null });
       dirty = false;
       showMsg('saved-msg');
     } catch (err) { showMsg('unsaved'); }
+  });
+
+  const passMsg = document.getElementById('pass-msg');
+  const sayPass = (text, ok) => { passMsg.textContent = text; passMsg.className = 'kt-msg ' + (ok ? 'kt-ok' : 'kt-err'); passMsg.hidden = false; };
+  function savePass(p, done) {
+    if (bannerOver()) return sayPass('The Banner has passed.', false);
+    try { kayStore.setPass(p); sayPass(done, true); } catch (e) { sayPass("That wasn't saved.", false); }
+  }
+
+  document.getElementById('purchase-btn').addEventListener('click', () => {
+    const v = form.elements.purchase_date.value;
+    savePass({ purchase: v || null, renewal: kayStore.pass().renewal }, v ? 'Purchase date saved.' : 'Purchase date cleared.');
+    form.elements.pass.checked = !!v && v === form.elements.entry_date.value;
+  });
+
+  document.getElementById('renewal-btn').addEventListener('click', () => {
+    const p = kayStore.pass(), v = form.elements.renewal_date.value;
+    if (p.renewal) return savePass({ purchase: p.purchase, renewal: null }, 'Renewal removed. The pass ends 30 days after the purchase.');
+    if (!p.purchase) return sayPass('Add the first purchase date before a renewal.', false);
+    if (!v) return sayPass('Pick the renewal date first.', false);
+    if (v <= p.purchase) return sayPass('The renewal date must be after the purchase date.', false);
+    savePass({ purchase: p.purchase, renewal: v }, 'Renewal saved.');
   });
 })();
 
@@ -539,7 +604,7 @@ dash.calc('breakdown', {
           cls += p === null ? ' kt-l2' : p >= 10 ? ' kt-l3' : p > 0 ? ' kt-l2' : ' kt-l1';
           info = p === null ? 'First entry' : fmt(p) + ' pulls since the last entry';
         } else if (t < today) { cls += ' kt-past'; info = 'No entry'; }
-        else info = t === endDay ? 'Banner ends 11:59' : 'Ahead';
+        else info = t === endDay ? 'Banner ends 11:59 PM' : 'Ahead';
         if (t === today) cls += ' kt-today';
         if (t === endDay) cls += ' kt-end';
         cell.className = cls;
@@ -592,7 +657,7 @@ dash.calc('breakdown', {
   const say = (text, ok) => { msg.textContent = text; msg.className = 'kt-msg ' + (ok ? 'kt-ok' : 'kt-err'); msg.hidden = false; };
 
   document.getElementById('export-btn').addEventListener('click', () => {
-    const data = { app: 'kay-tracker', version: 1, exported_at: new Date().toISOString(), entries: kayStore.all() };
+    const data = { app: 'kay-tracker', version: 1, exported_at: new Date().toISOString(), entries: kayStore.all(), pass: kayStore.pass() };
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
     const a = document.createElement('a');
     a.href = url; a.download = 'kay-tracker-backup-' + new Date().toLocaleDateString('en-CA') + '.json';
@@ -609,6 +674,7 @@ dash.calc('breakdown', {
     try {
       const parsed = JSON.parse(await file.text());
       const { added, skipped } = kayStore.importRows(Array.isArray(parsed) ? parsed : parsed.entries);
+      if (parsed && parsed.pass) kayStore.setPass(parsed.pass); // older backups have none; keep the current dates
       if (!added) say("That file had no entries this app can read.", false);
       else say('Imported ' + added + (added === 1 ? ' entry' : ' entries') + (skipped ? ', skipped ' + skipped + ' unreadable' : '') + '. Same-date entries were replaced.', true);
     } catch (e) { say("That file couldn't be read as a backup.", false); }
