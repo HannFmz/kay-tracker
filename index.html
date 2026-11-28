@@ -122,12 +122,18 @@
       <h2 class="kt-h">Log today's numbers</h2>
       <p class="kt-sub">Saving the same date again replaces that day. "Pulls done" is the banner's own counter toward 120.</p>
       <form id="log-form" class="kt-form">
-        <label class="kt-field">Date<input type="date" name="entry_date" min="2026-11-24" max="2026-12-31" required></label>
-        <label class="kt-field">Pulls done<input type="number" name="pulls_done" min="0" max="200" step="1" inputmode="numeric" required></label>
-        <label class="kt-field">Oroberyl<input type="number" name="oroberyl" min="0" step="1" inputmode="numeric" required></label>
-        <label class="kt-field">HH permits<input type="number" name="permits" min="0" step="1" inputmode="numeric" value="0"></label>
-        <label class="kt-field">Origeometry<input type="number" name="origeometry" min="0" step="1" inputmode="numeric" value="0"></label>
-        <label class="kt-field kt-check"><input type="checkbox" name="pass">Bought the Monthly Pass on this day</label>
+        <label class="kt-field">Date<input type="date" name="entry_date" min="2026-11-24" max="2026-12-31" required>
+          <span class="kt-help"><button type="button" class="kt-help-btn" aria-label="Help: Date" aria-expanded="false">?</button><span class="kt-help-tip"><span><b>Do:</b> pick the day you read these numbers. Saving the same date again replaces that day.</span><span><b>Don't:</b> log ahead of time. Entries are compared in date order.</span></span></span></label>
+        <label class="kt-field">Pulls done<input type="number" name="pulls_done" min="0" max="200" step="1" inputmode="numeric" required>
+          <span class="kt-help"><button type="button" class="kt-help-btn" aria-label="Help: Pulls done" aria-expanded="false">?</button><span class="kt-help-tip"><span><b>Do:</b> type the banner's total counter: every pull on Kay's banner so far.</span><span><b>Don't:</b> type only today's pulls. The app works out each day's pulls by subtraction.</span></span></span></label>
+        <label class="kt-field">Oroberyl<input type="number" name="oroberyl" min="0" step="1" inputmode="numeric" required>
+          <span class="kt-help"><button type="button" class="kt-help-btn" aria-label="Help: Oroberyl" aria-expanded="false">?</button><span class="kt-help-tip"><span><b>Do:</b> read Oroberyl and Pulls done at the same moment: both before pulling, or both after.</span><span><b>Don't:</b> take Oroberyl from before pulling and Pulls done from after (or the other way round).</span></span></span></label>
+        <label class="kt-field">HH permits<input type="number" name="permits" min="0" step="1" inputmode="numeric" value="0">
+          <span class="kt-help"><button type="button" class="kt-help-btn" aria-label="Help: HH permits" aria-expanded="false">?</button><span class="kt-help-tip"><span><b>Do:</b> type the permits you have now. Each counts as one pull.</span><span><b>Don't:</b> count permits you've already used. Those are in Pulls done.</span></span></span></label>
+        <label class="kt-field">Origeometry<input type="number" name="origeometry" min="0" step="1" inputmode="numeric" value="0">
+          <span class="kt-help"><button type="button" class="kt-help-btn" aria-label="Help: Origeometry" aria-expanded="false">?</button><span class="kt-help-tip"><span><b>Do:</b> type the Origeometry you have now. Each is worth 75 Oroberyl.</span><span><b>Don't:</b> count Origeometry you already converted. That's in your Oroberyl now.</span></span></span></label>
+        <label class="kt-field kt-check"><input type="checkbox" name="pass">Bought the Monthly Pass on this day
+          <span class="kt-help"><button type="button" class="kt-help-btn" aria-label="Help: Monthly Pass" aria-expanded="false">?</button><span class="kt-help-tip"><span><b>Do:</b> tick it only on the day you bought the pass.</span><span><b>Don't:</b> tick it every day the pass is active. For a purchase from before you started logging, use "Add specific date of monthly pass purchase".</span></span></span></label>
         <details class="kt-pass-more" id="pass-more">
           <summary>Add specific date of monthly pass purchase</summary>
           <div class="kt-pass-row">

@@ -278,6 +278,18 @@ dash.calc('breakdown', {
     el.style.background = swatch[el.dataset.swatch] || '';
   });
 
+  // "?" help: tap toggles one message, a tap anywhere else or Esc closes them all
+  function setHelp(h, on) { h.classList.toggle('open', on); h.querySelector('.kt-help-btn').setAttribute('aria-expanded', on); }
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.kt-help-btn');
+    const mine = btn && btn.parentElement;
+    document.querySelectorAll('.kt-help.open').forEach((h) => { if (h !== mine) setHelp(h, false); });
+    if (mine) setHelp(mine, !mine.classList.contains('open'));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') document.querySelectorAll('.kt-help.open').forEach((h) => setHelp(h, false));
+  });
+
   let dirty = false;
   const form = document.getElementById('log-form');
   const passPanel = document.getElementById('pass-more');
